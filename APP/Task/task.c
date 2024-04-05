@@ -27,7 +27,7 @@
 #include "seven_segment_display.h"
 #include <math.h>
 #include "calculator.h"
-
+//test
 // * 模式选择
 uint8_t Need_Back_To_Cross = true; // 白卡路段退回黑线
 uint8_t Turn_Check = true;		   // 转弯矫正
