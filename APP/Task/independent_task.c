@@ -123,18 +123,6 @@ void RFIDx_Begin(uint8_t index)
         break;
     }
 }
-uint8_t Get_RFIDx(void)
-{
-    if (CurrentRFIDCard == &RFID1)
-        return 1;
-    if (CurrentRFIDCard == &RFID2)
-        return 2;
-    if (CurrentRFIDCard == &RFID3)
-        return 3;
-    if (CurrentRFIDCard == &RFID4)
-        return 4;
-    return 0;
-}
 /************************************************************************************************************
  【函 数】:UseDefaultKey
  【参 数】:key:密钥地址     keyx:密钥值
