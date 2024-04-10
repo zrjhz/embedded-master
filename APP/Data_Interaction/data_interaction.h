@@ -49,10 +49,10 @@ void TrafficLight_Task(uint8_t index);
 void RequestToHost_WithData_Task(Zigbee_Header request, TFT_Task_t task);
 void TFT_Task(Zigbee_Header index, TFT_Task_t task, uint8_t second);
 void StaticMarker_Task(uint8_t index);
-void Any_Task(Zigbee_Header index);
+void Any_Task(FromHost_t index);
 
 void Send_QRCodeData(uint8_t *QRData, uint8_t length);
-void RequestToHost_Task(Zigbee_Header request);
+void RequestToHost_Task(uint8_t request);
 
 // 向上位机请求数据
 

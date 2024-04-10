@@ -1777,7 +1777,7 @@ void AGV_Task(DataToAGV_t agvData)
     RouteString_Process(agvData, agvRoute);
     print_info("AGV_Route:%s\r\n", agvRoute);
     AGV_SetRoute(agvRoute);
-    AGV_Start();
+    AGV_Send_None(AGV_CMD_Start);
     print_info("AGV_Start\r\n");
 }
 /************************************************************************************************************
@@ -1789,7 +1789,6 @@ void AGV_Task(DataToAGV_t agvData)
  ************************************************************************************************************/
 void AGV_Task_With_Msg(DataToAGV_t agvData)
 {
-    //	 AGV_Turn(135);
     uint8_t agvRoute[20];
 
     // 坐标、起始点、坐标处理
@@ -1801,91 +1800,40 @@ void AGV_Task_With_Msg(DataToAGV_t agvData)
     if (agvData.direction != DIR_NOTSET)
     {
         print_info("AGV_Dir:%d\r\n", agvData.direction);
-        AGV_SetTowards(agvData.direction);
+        AGV_Send_Single(AGV_CMD_Towards, agvData.direction);
     }
     // 报警码
     if (agvData.alarmData != NULL)
     {
         Dump_Array("AGV_Alarm:\r\n", agvData.alarmData, 6, 1);
-        AGV_SendInfraredData(agvData.alarmData);
+        AGV_Send_Multi(AGV_CMD_AlarmFront, &agvData.alarmData[0], 3);
+        delay_ms(200);
+        AGV_Send_Multi(AGV_CMD_AlarmBack, &agvData.alarmData[3], 3);
     }
     // 车牌信息
     if (agvData.carnum != NULL)
     {
         print_info("%s\r\n", agvData.carnum);
-        AGV_SendData(FromHost_AGVData8, agvData.carnum, 3);
+        AGV_Send_Multi(AGV_CMD_PlateFront, &agvData.carnum[0], 3);
         delay_ms(200);
-        AGV_SendData(FromHost_AGVData9, &agvData.carnum[3], 3);
+        AGV_Send_Multi(AGV_CMD_PlateBack, &agvData.carnum[3], 3);
     }
     // 路灯档位
     if (agvData.streetLightLevel > 0 && agvData.streetLightLevel <= 4)
     {
         print_info("LightLevel:%d\r\n", agvData.streetLightLevel);
-        AGV_SendData(AGVPresetData_StreetLight, &agvData.streetLightLevel, 1);
+        AGV_Send_Single(AGV_CMD_StreetLight, agvData.streetLightLevel);
     }
+    // 交通信号
     if (agvData.trafficSign != NULL)
     {
         print_info("trafficSign:d\r\n", agvData.trafficSign);
-        AGV_SendData(AGVPresetData_TrafficSign, &agvData.trafficSign, 1);
-    }
-    // 金华题算完的最终答案
-    if (agvData.AGV_data != NULL)
-    {
-        print_info("AGV_data:d\r\n", agvData.AGV_data);
-        AGV_SendData(FromHost_AGVData7, agvData.AGV_data, 2);
-    }
-    // 任务组
-    if (agvData.taskNumber != 0)
-    {
-        for (uint8_t i = 0; i < agvData.taskNumber; i++)
-        {
-            int8_t taskOrder = Get_TaskNumber(agvData.taskCoord[i].coord, agvRoute, 1);
-            print_info("Task%d: %d\r\n", i, taskOrder);
-            if (taskOrder != -1)
-            {
-                AGV_SetTaskID(taskOrder, agvData.taskCoord[i].taskID);
-            }
-        }
-    }
-    // 是否需要避让
-    bool needToAvoid = false;
-    if (agvData.avoidGarage != NULL)
-    {
-        // 检测主车当前位置是否在从车路径点内
-        if (Is_ContainCoordinate(agvRoute, ReCoordinate_Convert(CurrentStatus)) != -1)
-        {
-            needToAvoid = true;
-        }
-    }
-    // 处理避让临时入库
-    if (needToAvoid)
-    {
-        uint8_t *garage = NULL;
-        // 若首选库为从车入库点则选择备选库
-        if (Is_ContainCoordinate(agvRoute, agvData.avoidGarage) == -1)
-        {
-            garage = agvData.avoidGarage;
-        }
-        else
-        {
-            garage = agvData.avoidGarage2;
-        }
-        Reverse_Parcking(&CurrentStatus, garage, NULL);
+        AGV_Send_Single(AGV_CMD_TrafficSign, agvData.trafficSign);
     }
     delay(2000);
     // 启动
-    AGV_Start();
+    AGV_Send_None(AGV_CMD_Start);
     print_info("AGV_Start");
-
-    // 等待任务执行完成
-    WaitForFlagInMs(AGV_MissionComplete, SET, 25 * 1000);
-
-    // 避让完成后出库
-    if (needToAvoid)
-    {
-        MOVE(30);
-        //		TURN(180);
-    }
 }
 /************************************************************************************************************
  【函 数】:RouteString_Process

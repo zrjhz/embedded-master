@@ -151,12 +151,12 @@ void ZigBee_CmdHandler(uint8_t *cmd)
 // * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 交互函数 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 /************************************************************************************************************
  【函 数】:RequestToHost_Task
- 【参 数】:Zigbee_Header类型
+ 【参 数】:request Zigbee_Header类型
  【返 回】:
- 【简 例】:RequestToHost_Task('Zigbee_TrafficLight_A'); 识别交通灯任务
+ 【简 例】:RequestToHost_Task(Zigbee_TrafficLight_A); 识别交通灯任务
  【说 明】:向上位机请求任务
  ************************************************************************************************************/
-void RequestToHost_Task(Zigbee_Header request)
+void RequestToHost_Task(uint8_t request)
 {
     uint8_t requestTaskArray[] = {0x55, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0xBB};
     requestTaskArray[Pack_MainCmd] = request;
@@ -289,7 +289,7 @@ void TrafficLight_Task(uint8_t index)
 {
     ResetCmdFlag(FromHost_TrafficLight);
     TrafficLight_RecognitionMode(index);                               // 交通灯变色
-    delay_ms(2000);                                                     // 延迟
+    delay_ms(2000);                                                    // 延迟
     RequestToHost_Task(Get_TrafficLight_Index(index));                 // 识别交通灯
     WaitForFlagInMs(GetCmdFlag(FromHost_TrafficLight), SET, 9 * 1000); // 等待识别完成
     Beep(2);
@@ -340,17 +340,12 @@ void StaticMarker_Task(uint8_t index)
  【简 例】:Any_Task(Task_1)
  【说 明】:自定义任务
  ************************************************************************************************************/
-void Any_Task(Zigbee_Header index)
+void Any_Task(FromHost_t index)
 {
     ResetCmdFlag(FromHost_Completed);
-    uint16_t TFTdis;
-    TFTdis = Ultrasonic_GetAverage(5);
-    if (TFTdis > 100)
-        MOVE((TFTdis - 100) / 10);
     RequestToHost_Task(index);
     WaitForFlagInMs(GetCmdFlag(FromHost_Completed), SET, 30 * 1000);
     Beep(2);
-    MOVE(-((TFTdis - 100) / 10));
 }
 
 // * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 获取数据get ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓

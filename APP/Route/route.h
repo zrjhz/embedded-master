@@ -46,8 +46,6 @@ typedef struct DataToAGV_Strusct
     uint8_t *alarmData;        // 报警台数据
     taskCoord_t *taskCoord;    // 任务路径
     uint8_t taskNumber;        // 任务数量
-    uint8_t *barrierGateCoord; // 道闸坐标
-    uint8_t barrierdir;        // 道闸方向
     uint8_t *avoidGarage;      // 道闸避让
     uint8_t *avoidGarage2;     // 道闸避让2
     uint8_t routeLength;
@@ -55,7 +53,6 @@ typedef struct DataToAGV_Strusct
     uint8_t trafficSign;
     uint8_t *AGV_data;
     uint8_t *carnum;
-
 } DataToAGV_t;
 
 // 设定任务点（转换字符串生成坐标信息）

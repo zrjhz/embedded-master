@@ -14,82 +14,91 @@ extern void (*Send_ToHost)(uint8_t *, uint8_t);
 // 设定连接模式 true无线,false有线
 void SetConnectionMode(bool mode);
 
-// 上传数据包的结构
+// 通用ZigBee回传的数据状态和时间戳
+typedef struct ZigBee_DataStatus_Sturuct
+{
+    uint8_t isSet;
+    uint8_t cmd[8];
+    uint32_t timeStamp;
+} ZigBee_DataStatus_t;
+
+// * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 从车 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+typedef enum
+{
+    AGV_CMD_Start = 0xD0,      // 从车启动
+    AGV_CMD_Restart = 0xB0,    // 从车重启
+    AGV_CMD_Towards = 0x71,    // 从车方向
+    AGV_CMD_Routes = 0xE1,     // 从车路径
+    AGV_CMD_NextRoutes = 0xE3, // 从车路径
+
+    AGV_CMD_AlarmFront = 0x10, // 报警台前三位
+    AGV_CMD_AlarmBack = 0x11,  // 报警台后三位
+
+    AGV_CMD_PlateFront = 0xD6, // 车牌前三位
+    AGV_CMD_PlateBack = 0xD7,  // 车牌后三位
+
+    AGV_CMD_StreetLight = 0xEF, // 路灯挡位
+
+    AGV_CMD_TrafficSign = 0xE4, // 交通信号
+
+    AGV_CMD_Year = 0x37,        // 语音年份
+    AGV_CMD_Time = 0x38,        // 语音时间
+    AGV_CMD_WeatherTemp = 0x39, // 语音天气温度
+
+    AGV_CMD_StereoDistance = 0x70, // 立体显示距离
+
+    AGV_CMD_DataComplete = 0xE2, // 数据接收完成
+
+    AGV_CMD_Data1 = 0xEA, // 预留数据
+    AGV_CMD_Data2 = 0xEB, // 预留数据
+    AGV_CMD_Data3 = 0xEC, // 预留数据
+    AGV_CMD_Data4 = 0xED, // 预留数据
+    AGV_CMD_Data5 = 0xEE, // 预留数据
+} AGV_CMD_t;
+
+// 从车上传数据类型
 enum
 {
-    Pack_Header1,  // 帧头1
-    Pack_Header2,  // 帧头2
-    Pack_MainCmd,  // 主指令
-    Pack_SubCmd1,  // 副指令1
-    Pack_SubCmd2,  // 副指令2
-    Pack_SubCmd3,  // 副指令3
-    Pack_CheckSum, // 校验和
-    Pack_Ending    // 帧尾
+    AGVUploadType_Ultrasonic = 0x0B,    // 超声波
+    AGVUploadType_Brightness = 0x0A,    // 光照度
+    AGVUploadType_Alarm1 = 0x10,        // 烽火台
+    AGVUploadType_carflag = 0xB0,       // 临时避让二次启动
+    AGVUploadType_QRCodeData = 0x92,    // 二维码数据
+    AGVUploadType_MisonComplete = 0xFF, // 任务完成
+    AGVUploadType_platenum = 0x15,      // 车牌
+    AGV_Bfloor = 0x2B,                  // B车库初始
+    AGV_Afloor = 0x2A,                  // A车库初始
 };
 
-// 上位机发送的数据标识
+// 从车上传数据结构
 enum
 {
-    // 官方文档内指令
-    FromHost_Stop = 0x01,                       // 停止
-    FromHost_Go = 0x02,                         // 前进
-    FromHost_Back = 0x03,                       // 后退
-    FromHost_TurnLeft = 0x04,                   // 左转
-    FromHost_TurnRight = 0x05,                  // 右转
-    FromHost_TrackLine = 0x06,                  // 循迹
-    FromHost_EncoderClear = 0x07,               // 码盘清零
-    FromHost_TurnCountClockWiseToDigree = 0x08, // 左转弯--角度
-    FromHost_TurnClockWiseToDigree = 0x09,      // 右转弯--角度
-    FromHost_InfraredFrontData = 0x10,          // 红外前三位数据
-    FromHost_InfraredBackData = 0x11,           // 红外后三位数据
-    FromHost_InfraredSend = 0x12,               // 通知小车单片机发送红外线
-    FromHost_TurnningLightControl = 0x20,       // 转向灯控制
-    FromHost_Beep = 0x30,                       // 蜂鸣器
-    FromHost_NotUsed = 0x40,                    // 暂未使用
-    FromHost_InfraredPhotoPrevious = 0x50,      // 红外发射控制相片上翻
-    FromHost_InfraredPhotoNext = 0x51,          // 红外发射控制相片下翻
-    FromHost_InfraredLightAdd1 = 0x61,          // 红外发射控制光源强度档位加1
-    FromHost_InfraredLightAdd2 = 0x62,          // 红外发射控制光源强度档位加2
-    FromHost_InfraredLightAdd3 = 0x63,          // 红外发射控制光源强度档位加3
-    FromHost_AGVReturnData = 0x80,              // 从车返回数据
-    FromHost_VoiceRecognition = 0x90,           // 语音识别
-    FromHost_AGVRoad = 0x58,                    // 道闸信息
-    FromHost_AGVOpenMvQRCode = 0x92,            // OpenMv二维码识别
-    FromHost_AGVStart = 0xD0,                   // 从车启动
-    FromHost_AGVRestart = 0xB0,                 // 从车二次启动
-    FromHost_LEDDisplaySecomdRow = 0xc1,        // 数码管第二排显示是数据
-    FromHost_ReceivePresetHeadTowards = 0x71,   // 接收预案车头设置
-    FromHost_Start = 0xA1,                      // 小车启动命令
-
-    FromHost_QRCodeRecognition = 0xA2,  // 二维码识别
-    FromHost_PlateRecognition = 0xA3,   // 车牌识别
-    FromHost_ShapeRecongnition = 0xA4,  // 图像识别
-    FromHost_TrafficLight = 0xA5,       // 交通灯
-    FromHost_StreetLight = 0xA6,        // 路灯
-    FromHost_AlarmON = 0xA7,            // 报警器开
-    FromHost_AlarmOFF = 0xA8,           // 报警器关
-    FromHost_PlateData1 = 0x88,         // 车牌信息1
-    FromHost_PlateData2 = 0x99,         // 车牌信息2
-    FromHost_Garage = 0xB1,             // 立体车库
-    FromHost_TFTRecognition = 0xAC,     // TFT识别
-    FromHost_TextRecognition = 0xAD,    // Text识别
-    FromHost_TraSignRecognition = 0xAE, // 交通标志识别
-    FromHost_Completed = 0xB0,          // 安卓识别任务完成
-
-    // 从车专有的指令
-    FromHost_AGVRouting = 0xE1, // AGV 接收路径设置
-    FromHost_AGVSetTask = 0xE2, // AGV 接收任务设置
-    FromHost_AGVData1 = 0xEA,   // AGV 数据接口1
-    FromHost_AGVData2 = 0xEB,   // AGV 数据接口2
-    FromHost_AGVData3 = 0xEC,   // AGV 数据接口3
-    FromHost_AGVData4 = 0x39,   // AGV 数据接口4  语音天气温度
-    FromHost_AGVData5 = 0x37,   // AGV 数据接口5  语音年份
-    FromHost_AGVData6 = 0x38,   // AGV 数据接口6  语音时分
-    FromHost_AGVData7 = 0x70,   // AGV 数据接口7  处理之后的答案
-    FromHost_AGVData8 = 0xD6,   // AGV 数据接口8  车牌前三位
-    FromHost_AGVData9 = 0xD7,   // AGV 数据接口9  车牌后三位
-    FromHost_AGVData10 = 0xE4,   // AGV 数据接口9  交通标志
+    AGVUploadData_Header1 = 0,  // 包头1
+    AGVUploadData_Header2 = 1,  // 包头2
+    AGVUploadData_DataType = 2, // 数据类型
 };
+
+// * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 上位机 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+
+// 发送和接收上位机数据标识
+typedef enum
+{
+    FromHost_QRCodeRecognition = 0x00, // 二维码识别
+    FromHost_TrafficLight = 0x01,      // 交通灯
+    FromHost_TFTRecognition = 0x02,    // TFT识别
+    FromHost_Start = 0x03,             // 小车启动命令
+    FromHost_Completed = 0x04,         // 安卓识别任务完成
+
+    FromHost_1 = 0x20, // 安卓任务一
+    FromHost_2 = 0x21, // 安卓任务二
+    FromHost_3 = 0x22, // 安卓任务三
+    FromHost_4 = 0x23, // 安卓任务四
+    FromHost_5 = 0x24, // 安卓任务五
+    FromHost_6 = 0x25, // 安卓任务六
+    FromHost_7 = 0x26, // 安卓任务七
+    FromHost_8 = 0x27, // 安卓任务八
+    FromHost_9 = 0x28, // 安卓任务九
+} FromHost_t;
 
 // 上位机任务请求ID
 typedef enum
@@ -127,6 +136,21 @@ typedef enum
     DataRequest_TextNum = 21,           // 文字数量
 } DataRequest_t;
 
+// * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 标志物 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+
+// 上传数据包的结构
+enum
+{
+    Pack_Header1,  // 帧头1
+    Pack_Header2,  // 帧头2
+    Pack_MainCmd,  // 主指令
+    Pack_SubCmd1,  // 副指令1
+    Pack_SubCmd2,  // 副指令2
+    Pack_SubCmd3,  // 副指令3
+    Pack_CheckSum, // 校验和
+    Pack_Ending    // 帧尾
+};
+
 // TODO ZigBee设备 根据文档更改
 typedef enum
 {
@@ -152,17 +176,7 @@ typedef enum
     ZigBee_AutoJudgement = 0xAF,  // 自动评分系统
     Zigbee_StaticMarker_A = 0x15, // 静态标志物A (自定义)
     Zigbee_StaticMarker_B = 0x09, // 静态标志物B (自定义)
-
-    Task_1 = 0x20, // 安卓任务一
-    Task_2 = 0x21, // 安卓任务二
-    Task_3 = 0x22, // 安卓任务三
-    Task_4 = 0x23, // 安卓任务四
-    Task_5 = 0x24, // 安卓任务五
-    Task_6 = 0x25, // 安卓任务六
-    Task_7 = 0x26, // 安卓任务七
-    Task_8 = 0x27, // 安卓任务八
-    Task_9 = 0x28, // 安卓任务九
-} Zigbee_Header;   // 标志物的第二位帧头指令
+} Zigbee_Header;                  // 标志物的第二位帧头指令
 
 // 标志物和请求名称区分
 enum
@@ -188,65 +202,6 @@ enum
     ETC,            // 智能ETC系统
     AutoJudgement,  // 自动评分系统
 };
-
-// 通用ZigBee回传的数据状态和时间戳
-typedef struct ZigBee_DataStatus_Sturuct
-{
-    uint8_t isSet;
-    uint8_t cmd[8];
-    uint32_t timeStamp;
-} ZigBee_DataStatus_t;
-
-// AGV预设任务
-enum
-{
-    AGVPreasetTask_AdjustBarrier = 9, // 障碍点设置
-    AGVPreasetTask_QRCode = 8,        // 扫描二维码并上传
-    AGVPreasetTask_Streetlight = 7,   // 调整路灯档位
-    AGVPreasetTask_Distance = 6,      // 上传距离信息
-    AGVPreasetTask_SpecialRoad = 5,   // 特殊地形
-    AGVPreasetTask_TrafficLight = 4,  // 交通灯识别
-    AGVPreasetTask_Image = 3,         // 图像识别
-};
-
-// AGV预设数据
-enum
-{
-    AGVPresetData_StreetLight = 0xEF, // 路灯档位
-    AGVPresetData_TrafficSign = 0xEA, // 立体显示交通标志
-    AGVData_carnum1 = 0xD6,           // 车牌前三位
-    AGVData_carnum2 = 0xD7,           // 车牌后三位
-};
-
-// 从车上传数据结构
-enum
-{
-    AGVUploadData_Header1 = 0,  // 包头1
-    AGVUploadData_Header2 = 1,  // 包头2
-    AGVUploadData_DataType = 2, // 数据类型
-};
-
-// 从车上传数据类型
-enum
-{
-    AGVUploadType_Ultrasonic = 0x0B, // 超声波
-    AGVUploadType_Brightness = 0x0A, // 光照度
-    AGVUploadType_Alarm1 = 0x10,     // 烽火台
-    AGVUploadType_carflag = 0xB0,    // 临时避让二次启动
-    AGVUploadType_QRCodeData = 0x92, // 二维码数据
-    AGVUploadType_MisonComplete = 0xFF,
-    AGVUploadType_platenum = 0x15, // 车牌
-    AGV_Bfloor = 0x2B,             // B车库初始
-    AGV_Afloor = 0x2A,             // A车库初始
-};
-
-// 从车RFID数据结构
-enum
-{
-    AGVRFID_Route = 1,      // 从车路径
-    AGVRFID_Coordinate = 2, // 从车初始坐标
-};
-
 // 数据 发送/请求/返回 的包结构
 
 // 发送 [0][1] 包头 [2] 发送ID [3] 数据长度 [4+] 数据区域
@@ -265,7 +220,7 @@ enum
     Data_Content = 4, // 数据发送位 |    | Y  |    |
 };
 
-// 数据发送ID
+// 向上位机数据发送ID
 typedef enum
 {
     DataSend_QRCode = 0,     // 二维码
