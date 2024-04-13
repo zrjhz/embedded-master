@@ -131,4 +131,7 @@ int hexValue(char c);
 int combineHex(char c1, char c2);
 uint8_t mergeHexValues(uint8_t a, uint8_t b);
 void get_by_char_3(uint8_t arr[], uint8_t *res);
+uint8_t getFirstDigit(uint8_t arr[], uint8_t letterOrDigit, uint8_t position);
+uint16_t countLetter(uint8_t arr[]);
+void extractDigits(uint8_t *in, uint8_t *out);
 #endif //__MY_LIB_H__

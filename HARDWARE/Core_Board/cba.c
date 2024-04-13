@@ -73,6 +73,7 @@ void KEY_Check(void)
 		{
 			while (!S2)
 				;
+			Task_F2();
 		}
 	}
 	if (S3 == 0)

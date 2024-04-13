@@ -18,7 +18,15 @@ static const char *badCoordinate = "\0\0\0";
 static const RouteNode_t badNode = {.x = -1, .y = -1, .dir = DIR_NOTSET};
 //  任务和路径设定
 RouteSetting_t Route_Task[] = {
-    {.coordinate = NULL, .Task = NULL, .node.dir = DIR_LEFT},
+    {.coordinate = "G2", .Task = Task_G2, .node.dir = DIR_LEFT},
+    {.coordinate = "F2", .Task = Task_F2},
+    {.coordinate = "F4", .Task = Task_F4},
+    {.coordinate = "F5", .Task = Task_F5},
+    {.coordinate = "F6", .Task = Task_F6},
+    {.coordinate = "D6", .Task = Task_D6},
+    {.coordinate = "D4", .Task = Task_D4},
+    {.coordinate = "D2", .Task = Task_D2},
+    {.coordinate = "B2", .Task = Task_B2},
 };
 
 // 任务点个数

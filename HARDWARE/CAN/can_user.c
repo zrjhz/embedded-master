@@ -19,9 +19,9 @@
 uint8_t Wifi_Rx_Buf[WIFI_MAX_NUM];
 uint8_t Zigb_Rx_Buf[ZIGB_RX_MAX];
 uint8_t Wifi_Rx_num;
-uint8_t Wifi_Rx_flag; //接收完成标志位
+uint8_t Wifi_Rx_flag; // 接收完成标志位
 uint8_t Zigbee_Rx_num;
-uint8_t Zigbee_Rx_flag; //接收完成标志位
+uint8_t Zigbee_Rx_flag; // 接收完成标志位
 
 uint32_t canu_wifi_rxtime = 0;
 uint32_t canu_zibe_rxtime = 0;
@@ -61,7 +61,7 @@ void Normal_data(void) // 正常接收8字节控制指令
     }
 }
 
-void Abnormal_data(void) //数据异常处理
+void Abnormal_data(void) // 数据异常处理
 {
     u8 i, j;
     u8 sum = 0;
@@ -96,7 +96,7 @@ void Abnormal_data(void) //数据异常处理
     }
 }
 
-uint8_t Infrared_Tab[6]; //红外数据存放数组
+uint8_t Infrared_Tab[6]; // 红外数据存放数组
 
 void Can_WifiRx_Check(void)
 {
@@ -105,35 +105,25 @@ void Can_WifiRx_Check(void)
         if (gt_get_sub(canu_wifi_rxtime) == 0)
         {
             if (Wifi_Rx_Buf[0] == 0xFD)
-            {
                 Send_ZigbeeData_To_Fifo(Wifi_Rx_Buf, (Wifi_Rx_num + 1));
-            }
             else if (Wifi_Rx_Buf[0] == 0x55) // 普通WIFI/ZigBee指令
-            {
                 Normal_data();
-            }
             else if (Wifi_Rx_Buf[0] == 0x56) // 自定义数据处理
             {
                 HostData_Handler(Wifi_Rx_Buf);
                 Rx_Flag = 0; // 跳过后续的数据处理
             }
             else
-            {
                 Abnormal_data();
-            }
             Wifi_Rx_flag = 0;
         }
     }
     if (Rx_Flag == 1)
     {
         if (Wifi_Rx_Buf[1] == 0xAA)
-        {
             Process_CommandFromHost(Wifi_Rx_Buf[2]); // 判断指令,执行、置位
-        }
         else
-        {
             Send_ZigbeeData_To_Fifo(Wifi_Rx_Buf, 8);
-        }
         Rx_Flag = 0;
     }
 }
@@ -146,15 +136,15 @@ void Can_WifiRx_Check(void)
 void Can_ZigBeeRx_Save(uint8_t res)
 {
     /*	if(Zigbee_Rx_flag == 0)
-	{
-		Zigb_Rx_Buf[Zigbee_Rx_num]=res;
-		Zigbee_Rx_num++;
-		if(Zigbee_Rx_num > ZIGB_RX_MAX )	
-		{
-			Zigbee_Rx_num = 0;
-			Zigbee_Rx_flag = 1;
-		} 
-	} */
+    {
+        Zigb_Rx_Buf[Zigbee_Rx_num]=res;
+        Zigbee_Rx_num++;
+        if(Zigbee_Rx_num > ZIGB_RX_MAX )
+        {
+            Zigbee_Rx_num = 0;
+            Zigbee_Rx_flag = 1;
+        }
+    } */
 
     if (Zigbee_Rx_flag == 0)
     {
@@ -181,7 +171,7 @@ void Can_ZigBeeRx_Check(void)
         if (gt_get_sub(canu_zibe_rxtime) == 0)
         {
             // 对收到的ZigBee指令或数据进行处理
-            ZigBee_CmdHandler(Zigb_Rx_Buf); 
+            ZigBee_CmdHandler(Zigb_Rx_Buf);
             Zigbee_Rx_flag = 0;
         }
     }
@@ -213,6 +203,6 @@ void Canuser_upTrackTime(void)
 void Canuser_main(void)
 {
     CanP_Host_Main();
-    //CanP_CanTx_Check();				//CAN总线发送数据监测
+    // CanP_CanTx_Check();				//CAN总线发送数据监测
     CanP_CanTx_Check_fIrq();
 }

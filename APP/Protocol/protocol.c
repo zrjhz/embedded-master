@@ -95,7 +95,7 @@ DataSetting_t DataBuffer[] = {
 uint8_t DATA_REQUEST_NUMBER = GET_ARRAY_LENGEH(DataBuffer);
 
 // 上位机指令接收状态
-uint8_t CommandFlagStatus[0xFF] = {0};
+uint8_t CommandFlagStatus[0x30] = {0};
 
 #if 0
 // C中没有泛型,有些函数不容易实现,所以这里宏定义实现

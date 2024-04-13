@@ -23,6 +23,8 @@ typedef struct ZigBee_DataStatus_Sturuct
 } ZigBee_DataStatus_t;
 
 // * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 从车 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+
+//对应从车里的枚举
 typedef enum
 {
     AGV_CMD_Start = 0xD0,      // 从车启动
@@ -49,11 +51,12 @@ typedef enum
 
     AGV_CMD_DataComplete = 0xE2, // 数据接收完成
 
-    AGV_CMD_Data1 = 0xEA, // 预留数据
-    AGV_CMD_Data2 = 0xEB, // 预留数据
-    AGV_CMD_Data3 = 0xEC, // 预留数据
-    AGV_CMD_Data4 = 0xED, // 预留数据
-    AGV_CMD_Data5 = 0xEE, // 预留数据
+    AGV_CMD_Data1 = 0xEA, // 预留数据单
+    AGV_CMD_Data2 = 0xEB, // 预留数据单
+    AGV_CMD_Data3 = 0xEC, // 预留数据单
+    AGV_CMD_Data4 = 0xED, // 预留数据多
+    AGV_CMD_Data5 = 0xEE, // 预留数据多
+    AGV_CMD_Data6 = 0xEF, // 预留数据多
 } AGV_CMD_t;
 
 // 从车上传数据类型
@@ -80,7 +83,13 @@ enum
 
 // * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 上位机 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 
-// 发送和接收上位机数据标识
+// 当前指令状态和数据内容存放(指令不连续和标志位使用造成的空间浪费暂时未解决)
+extern uint8_t CommandFlagStatus[0x30];
+#define GetCmdFlag(id) CommandFlagStatus[id]
+#define SetCmdFlag(id) CommandFlagStatus[id] = SET
+#define ResetCmdFlag(id) CommandFlagStatus[id] = RESET
+
+// 发送和接收安卓数据标识 对应安卓中的Send_Command文件
 typedef enum
 {
     FromHost_QRCodeRecognition = 0x00, // 二维码识别
@@ -109,7 +118,7 @@ typedef enum
     TFT_Task_Mask = 4,        // 识别口罩
 } TFT_Task_t;
 
-// 安卓接收的下标 不了解安卓端别改!!!!
+// 安卓接收的下标 对应安卓中的SendDataUtils文件
 typedef enum
 {
     DataRequest_NotUsed = 0,            // 未使用
@@ -474,16 +483,9 @@ static uint8_t ZigBee_VoiceData[8] = {0x55, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 
 static uint8_t ZigBee_VoiceReturnData[8] = {0xAF, 0x06, 0x00, 0x02, 0x00, 0x00, 0x01, 0xBB};  // 语音返回自动评分终端
 static uint8_t ZigBee_SpecialRoadData[8] = {0x55, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0xBB};  // 特殊地形
 
-// 当前指令状态和数据内容存放(指令不连续和标志位使用造成的空间浪费暂时未解决)
-extern uint8_t CommandFlagStatus[0xFF];
-
 // 数据请求编号数量
 extern uint8_t DATA_REQUEST_NUMBER;
 extern DataSetting_t DataBuffer[];
-
-#define GetCmdFlag(id) CommandFlagStatus[id]
-#define SetCmdFlag(id) CommandFlagStatus[id] = SET
-#define ResetCmdFlag(id) CommandFlagStatus[id] = RESET
 
 // 执行N次,带延迟
 #define ExcuteNTimes(Task, N, delay)    \

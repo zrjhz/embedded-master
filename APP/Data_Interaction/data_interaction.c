@@ -324,14 +324,14 @@ void TFT_Task(Zigbee_Header TFTx, TFT_Task_t task, uint8_t second)
 void StaticMarker_Task(uint8_t index)
 {
     ResetCmdFlag(FromHost_QRCodeRecognition);
-    uint16_t Staticdis;
-    Staticdis = Ultrasonic_GetAverage(5);
-    if (Staticdis > 150)
-        MOVE((Staticdis - 150) / 10);
+    // uint16_t Staticdis;
+    // Staticdis = Ultrasonic_GetAverage(5);
+    // if (Staticdis > 150)
+    //     MOVE((Staticdis - 150) / 10);
     RequestToHost_Task(Get_StaticMarker_Index(index));
     WaitForFlagInMs(GetCmdFlag(FromHost_QRCodeRecognition), SET, 15 * 1000);
     Beep(2);
-    MOVE(-((Staticdis - 150) / 10));
+    // MOVE(-((Staticdis - 150) / 10));
 }
 /************************************************************************************************************
  【函 数】:Any_Task
@@ -367,14 +367,13 @@ uint8_t *Get_PlateNumber(Zigbee_Header TFTx)
  【参 数】:
  【返 回】:
  【简 例】:
- 【说 明】:获取二维码（字符串）//QRCode_x为向上位机请求的ID,use为从哪个标志物上识别到的二维码
+ 【说 明】:获取二维码（字符串）QRCode_x为向上位机请求的ID,static_x为从哪个标志物上识别到的二维码
  ************************************************************************************************************/
-uint8_t *Get_QRCode(uint8_t QRCode_x, DataRequest_t use)
+uint8_t *Get_QRCode(DataRequest_t QRCode_x, uint8_t static_x)
 {
-    uint8_t QRID = (QRCode_x == 1) ? DataRequest_QRCode1 : DataRequest_QRCode2;
-    uint8_t buf[] = {use};
-    ResetRquestWait(QRID, buf);
-    ReturnBuffer(QRID);
+    uint8_t buf[] = {Get_StaticMarker_Index(static_x)};
+    ResetRquestWait(QRCode_x, buf);
+    ReturnBuffer(QRCode_x);
 }
 /************************************************************************************************************
  【函 数】:Get_TrafficLight

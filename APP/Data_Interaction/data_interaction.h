@@ -57,7 +57,7 @@ void RequestToHost_Task(uint8_t request);
 // 向上位机请求数据
 
 uint8_t *Get_PlateNumber(Zigbee_Header TFTx);
-uint8_t *Get_QRCode(uint8_t QRCode_x, DataRequest_t use);
+uint8_t *Get_QRCode(DataRequest_t QRCode_x, uint8_t static_x);
 uint8_t Get_TrafficLight(uint8_t light_x);
 uint8_t Get_ShapeNumber(uint8_t TFTx, Shape_t Shape);
 uint8_t Get_ColorNumber(uint8_t TFTx, Color_t Color);

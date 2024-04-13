@@ -430,6 +430,13 @@ uint8_t *get_data(uint8_t num[], uint8_t len)
 	return NumGroup;
 }
 
+/************************************************************************************************************
+ 【函 数】:get_by_char
+ 【参 数】:binaryString 输入字符串
+ 【返 回】:
+ 【简 例】:
+ 【说 明】:提取[]内的数字
+ ************************************************************************************************************/
 void get_by_char(uint8_t arr[], uint8_t *res)
 {
 	const uint8_t *start = arr;
@@ -449,7 +456,13 @@ void get_by_char(uint8_t arr[], uint8_t *res)
 		}
 	}
 }
-
+/************************************************************************************************************
+ 【函 数】:get_by_char_2
+ 【参 数】:binaryString 输入字符串
+ 【返 回】:
+ 【简 例】:
+ 【说 明】:提取{}内
+ ************************************************************************************************************/
 bool get_by_char_2(const uint8_t *arr, char *res)
 {
 	int count = 0;
@@ -479,7 +492,13 @@ bool get_by_char_2(const uint8_t *arr, char *res)
 
 	return inside_braces; // 返回是否成功提取了花括号内的字符串
 }
-//提取数字和字母
+/************************************************************************************************************
+ 【函 数】:get_by_char_3
+ 【参 数】:arr 输入数组		res 输出数组
+ 【返 回】:
+ 【简 例】:
+ 【说 明】:提取数字和字母
+ ************************************************************************************************************/
 void get_by_char_3(uint8_t arr[], uint8_t *res)
 {
 	const uint8_t *start = arr;
@@ -497,7 +516,13 @@ void get_by_char_3(uint8_t arr[], uint8_t *res)
 		}
 	}
 }
-
+/************************************************************************************************************
+ 【函 数】:binaryToChar
+ 【参 数】:binaryString 输入字符串
+ 【返 回】:
+ 【简 例】:
+ 【说 明】:
+ ************************************************************************************************************/
 char binaryToChar(const char *binaryString)
 {
 	char result = 0;
@@ -508,7 +533,13 @@ char binaryToChar(const char *binaryString)
 	}
 	return result;
 }
-
+/************************************************************************************************************
+ 【函 数】:copyArrayRange
+ 【参 数】:inputArray 输入数组	start 起点(包含)	end 终点(包含)	outputArray 输出数组
+ 【返 回】:
+ 【简 例】:copyArrayRange([0,1,2,3], 1, 2, 输出) 输出=[1, 2]
+ 【说 明】:截取数组
+ ************************************************************************************************************/
 void copyArrayRange(const uint8_t *inputArray, uint8_t start, uint8_t end, uint8_t *outputArray)
 {
 	uint8_t i, j;
@@ -669,4 +700,84 @@ uint8_t mergeHexValues(uint8_t a, uint8_t b)
 {
 	uint8_t result = (a << 4) | b;
 	return result;
+}
+/************************************************************************************************************
+ 【函 数】:countLetter
+ 【参 数】:a 输入
+ 【返 回】:
+ 【简 例】:countLetter('A0BBC33DDBA01CD2'); 返回2323
+ 【说 明】:返回ABCD计数
+ ************************************************************************************************************/
+uint16_t countLetter(uint8_t arr[])
+{
+	const uint8_t *p = arr;
+	uint8_t A = 0, B = 0, C = 0, D = 0;
+
+	while (*p != '\0')
+	{
+		if (*p == 'A')
+			A++;
+		if (*p == 'B')
+			B++;
+		if (*p == 'C')
+			C++;
+		if (*p == 'D')
+			D++;
+		p++;
+	}
+
+	return A * 1000 + B * 100 + C * 10 + D;
+}
+/************************************************************************************************************
+ 【函 数】:getFirstDigit
+ 【参 数】:arr 字符串	letterOrDigit 0字母或1数字	position 0首位或1末尾
+ 【返 回】:
+ 【简 例】:countLetter('A0BBC33DDBA01CD2',0 ,0); 返回0
+ 【说 明】:返回字母或数字下标
+ ************************************************************************************************************/
+uint8_t getFirstDigit(uint8_t arr[], uint8_t letterOrDigit, uint8_t position)
+{
+	uint8_t index = 0;
+	uint8_t length = 16;
+
+	switch (position)
+	{
+	case 0:
+		for (size_t i = 0; i < length; i++)
+		{
+			uint8_t c = arr[i];
+			if ((letterOrDigit == 0 && (c >= 'A' && c <= 'Z')) || (letterOrDigit == 1 && (c >= '0' && c <= '9')))
+			{
+				index = i;
+				break;
+			}
+		}
+		break;
+	case 1:
+		for (int i = length - 1; i >= 0; i--)
+		{
+			uint8_t c = arr[i];
+			if ((letterOrDigit == 0 && (c >= 'A' && c <= 'Z')) || (letterOrDigit == 1 && (c >= '0' && c <= '9')))
+			{
+				index = i;
+				break;
+			}
+		}
+		break;
+	}
+
+	return index;
+}
+// 提取数字
+void extractDigits(uint8_t *in, uint8_t *out)
+{
+	int i, j;
+
+	for (i = 0, j = 0; in[i] != '\0'; i++)
+	{
+		if ((in[i] >= '0' && in[i] <= '9'))
+			out[j++] = in[i];
+	}
+
+	out[j] = '\0'; // 在提取的数字字符数组末尾添加字符串结束符
 }

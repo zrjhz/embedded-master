@@ -29,6 +29,14 @@ extern uint16_t h;              // 超声波数据
 extern uint8_t *AGV_routeInfo;  // 从车路线
 extern uint8_t *AGV_StartPoint; // 从车起点
 extern uint8_t plate[6];        // 获取的车牌
+extern uint8_t E;               // 第一张张扇区
+extern uint8_t S;               // 第二张张扇区
+extern uint8_t FN;              // 卡1ABCD频次
+extern uint8_t s1;              // 卡1首个数字
+extern uint8_t s2;              // 卡1末个数字
+extern uint8_t M01;             // 卡2有效字符串
+
+uint8_t card1_first = true; // 第一张卡是否为card1
 // 白卡的标志位和指针
 
 uint8_t RFID_Index = 0;
@@ -175,8 +183,50 @@ uint8_t Read_RFID(void)
         {
             if (RFID_Index == 1)
             {
-                if (i == 0 && CurrentRFIDCard->data[i] == "ID01")
+                switch (i)
                 {
+                case 0:
+                    if (CurrentRFIDCard->data[i] == "ID01")
+                    {
+                        RFID1_Block[1].block = 4 * E + 1;
+                        RFID2_Block[1].block = 4 * S + 1;
+                        card1_first = true;
+                    }
+                    else
+                    {
+                        RFID1_Block[1].block = 4 * S + 1;
+                        RFID2_Block[1].block = 4 * E + 1;
+                        card1_first = false;
+                    }
+                    break;
+                case 1:
+                    if (card1_first)
+                    {
+                        FN = countLetter(CurrentRFIDCard->data[i]);
+                        s1 = getFirstDigit(CurrentRFIDCard->data[i], 1, 0);
+                        s2 = getFirstDigit(CurrentRFIDCard->data[i], 1, 1);
+                    }
+                    else
+                    {
+                        extractDigits(CurrentRFIDCard->data[i], M01);
+                    }
+                    break;
+                }
+            }
+            else
+            {
+                if (i == 1)
+                {
+                    if (!card1_first)
+                    {
+                        FN = countLetter(CurrentRFIDCard->data[i]);
+                        s1 = getFirstDigit(CurrentRFIDCard->data[i], 1, 0);
+                        s2 = getFirstDigit(CurrentRFIDCard->data[i], 1, 1);                                                                        
+                    }
+                    else
+                    {
+                        extractDigits(CurrentRFIDCard->data[i], M01);
+                    }
                 }
             }
         }
