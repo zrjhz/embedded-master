@@ -83,7 +83,7 @@ uint8_t y;              // 首个出现的字母的位置
 uint16_t FN;            // 卡1ABCD频次
 uint8_t s1;             // 卡1首个数字
 uint8_t s2;             // 卡1末个数字
-uint8_t M01;            // 卡2有效字符串
+uint8_t *M01;            // 卡2有效字符串
 
 extern Block_Info_t RFID1_Block[2];
 extern Block_Info_t RFID2_Block[2];

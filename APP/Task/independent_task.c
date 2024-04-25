@@ -34,7 +34,7 @@ extern uint8_t S;               // 第二张张扇区
 extern uint8_t FN;              // 卡1ABCD频次
 extern uint8_t s1;              // 卡1首个数字
 extern uint8_t s2;              // 卡1末个数字
-extern uint8_t M01;             // 卡2有效字符串
+extern uint8_t *M01;             // 卡2有效字符串
 
 uint8_t card1_first = true; // 第一张卡是否为card1
 // 白卡的标志位和指针
