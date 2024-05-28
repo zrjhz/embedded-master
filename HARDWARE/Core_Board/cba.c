@@ -73,7 +73,7 @@ void KEY_Check(void)
 		{
 			while (!S2)
 				;
-			Task_F2();
+			TrafficLight_Task('A');
 		}
 	}
 	if (S3 == 0)
@@ -82,6 +82,7 @@ void KEY_Check(void)
 		if (S3 == 0)
 		{
 			while (!S3)
+			TFT_PictureNext('A');
 				;
 		}
 	}
@@ -92,6 +93,7 @@ void KEY_Check(void)
 		{
 			while (!S4)
 				;
+			Start_Tracking();
 		}
 	}
 }

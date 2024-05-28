@@ -2,8 +2,7 @@
 #include "my_lib.h"
 
 // float Kp = 35, Ki = 0.4, Kd = 12;
-
-float Kp = 35, Ki = 0.10, Kd = 16;
+float Kp = 35, Ki = 0.1, Kd = 5.4;
 float error = 0, P = 0, I = 0, D = 0, PID_value = 0;
 float previous_error = 0;
 

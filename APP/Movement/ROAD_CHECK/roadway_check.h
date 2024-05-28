@@ -49,14 +49,14 @@ static const float _CentermetersPerSecondAtSpeed50 = 36.0;
 // 循迹模式
 typedef enum
 {
-    TrackMode_NONE = 0,           // 没有在动
-    TrackMode_NORMAL,             // 红外+矫正循迹
-    TrackMode_ENCODER,            // 码盘+矫正循迹
-    TrackMode_Turn,               // 转弯
-    TrackMode_BACK_TO_CROSS,      // 退回黑线
-    TrackMode_Turn_CHECK,         // 转弯矫正
+    TrackMode_NONE = 0,            // 没有在动
+    TrackMode_NORMAL,              // 红外+矫正循迹
+    TrackMode_ENCODER,             // 码盘+矫正循迹
+    TrackMode_Turn,                // 转弯
+    TrackMode_BACK_TO_CROSS,       // 退回黑线
+    TrackMode_Turn_CHECK,          // 转弯矫正
     TrackMode_ENCODER_SpecialRoad, // 过特殊地形
-} TrackMode_t;                    // 车子是因为什么在动
+} TrackMode_t;                     // 车子是因为什么在动
 
 // 根据码盘值运动的模式
 typedef enum
