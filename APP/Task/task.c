@@ -83,115 +83,24 @@ uint8_t y;              // 首个出现的字母的位置
 uint16_t FN;            // 卡1ABCD频次
 uint8_t s1;             // 卡1首个数字
 uint8_t s2;             // 卡1末个数字
-uint8_t *M01;            // 卡2有效字符串
+uint8_t *M01;           // 卡2有效字符串
 
 extern Block_Info_t RFID1_Block[2];
 extern Block_Info_t RFID2_Block[2];
 
-void Task_G2()
-{
-    Start_Task();
-}
-
 void Task_F2()
 {
-    StaticMarker_Task('A');
-    uint8_t *red_code = Get_QRCode(DataRequest_QRCode1, 'A');   // D3AC6B68A5
-    uint8_t *green_code = Get_QRCode(DataRequest_QRCode2, 'A'); // 010203
-
-    memcpy(YS, red_code, 16);
-    memcpy(Green_Code, green_code, 16);
-
-    Dump_Array("red:", YS, 16, 0);
-    // Dump_Array("green:", Green_Code, 16, 1);
-
-    for (size_t i = 0; i < 2; i++)
-    {
-        for (size_t j = 0; j < 6; j++)
-        {
-            RFID1_Block[i].key[j] = Green_Code[j];
-            RFID2_Block[i].key[j] = Green_Code[j];
-        }
-    }
-    // Dump_Array("key:", RFID1_Block[0].key, 6, 1);
-
-    x = getFirstDigit(YS, 0, 0);
-    E = hexValue(YS[x]);
-    x++;
-    y = getFirstDigit(Green_Code, 1, 1);
-    S = hexValue(Green_Code[y]);
-
-    print_info("E:%X x:%X S:%X y:%X\r\n", E, x, S, y);
-    // L = DistanceMeasure_Task(); // 静态标志物测距
-    // delay(1000);
-
-    // TURN_TO(DIR_DOWN); // 转弯矫正
-    // delay(1000);
-    // Start_Turn_Check();
-    // Start_Turn_Check();
-    // delay(3000);
-
-    // TrafficLight_Task('A'); // 交通灯识别
-    // delay(1000);
-}
-
-void Task_F4() {}
-
-void Task_F5()
-{
-    RFID_Start(); // 白卡开始
-}
-
-void Task_F6()
-{
-    Voice_Recognition(); // 语音
-    delay(1000);
-
-    SpecialRoad_Start(); // 特殊地形开始
-}
-
-void Task_D6()
-{
-    SpecialRoad_End(); // 特殊地形结束
-}
-
-void Task_D4()
-{
-    RFID_End(); // 白卡任务结束
-    delay(1000);
-
-    TURN_TO(DIR_LEFT); // 路灯 TODO
-    delay(1000);
-    n = StreetLight_Now();
-    delay(1000);
-    T = (n ^ 2 + 3 * L) % 4 + 1;
-    StreetLight_AdjustTo(T);
-    delay(3000);
+    TURN_TO(DIR_DOWN);
+    RequestToHost_Task(Zigbee_TrafficLight_A); // 识别交通灯
 }
 
 void Task_D2()
 {
-    TFT_Task(Zigbee_TFT_A, TFT_Task_License, 5); // 识别车牌
-    delay(3000);
-    memcpy(plate, Get_PlateNumber(Zigbee_TFT_A), 6);
-    print_info("plate:%s\r\n", plate);
-    delay(1000);
-
-    TURN_TO(DIR_LEFT); // ETC
-    delay(1000);
-    ETC_Task();
+    TURN_TO(DIR_LEFT);
+    RequestToHost_Task(Zigbee_TrafficLight_B); // 识别交通灯
 }
 
-void Task_B2()
+void Task_F6()
 {
-    AGV_Send_None(AGV_CMD_Start);
-    delay(3000);
-
-    Wait_GarageToFristLayer('A');
-    delay(1000);
-    Reverse_Parcking(&CurrentStatus, "B1", 'A');
-    delay(1000);
-    StereoGarage_ToLayer('A', 3);
-    WirelessCharging_ON();
-    End_Task(); // 任务结束
+    BarrierGate_Control(0x01);
 }

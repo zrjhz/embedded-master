@@ -1176,16 +1176,16 @@ void Reverse_Parcking(RouteNode_t *current, uint8_t targetGarage[3], uint8_t Ste
 
     Move_ByEncoder(30, -80);
 
-    // bool garage_front_flag = false;
-    // bool garage_back_flag = false;
+    bool garage_front_flag = false;
+    bool garage_back_flag = false;
 
-    // while (!(garage_front_flag && garage_back_flag))
-    // {
-    //     if (!garage_front_flag && !Get_StereoGrageInfraredStatus(StereoGarage_x)[0])
-    //         garage_front_flag = true;
-    //     if (!garage_back_flag && !Get_StereoGrageInfraredStatus(StereoGarage_x)[1])
-    //         garage_back_flag = true;
-    // }
+    while (!(garage_front_flag && garage_back_flag))
+    {
+        if (!garage_front_flag && !Get_StereoGrageInfraredStatus(StereoGarage_x)[0])
+            garage_front_flag = true;
+        if (!garage_back_flag && !Get_StereoGrageInfraredStatus(StereoGarage_x)[1])
+            garage_back_flag = true;
+    }
 
     MOVE(5);
     Stop();
@@ -1230,7 +1230,7 @@ uint8_t *Get_StereoGrageInfraredStatus(uint8_t garage_x)
     static uint8_t IRStatus[2];
 
     ZigBee_DataStatus_t *StereoGarage_Status;
-    StereoGarage_Status = (garage_x == StereoGarage_A) ? (&StereoGarage_A_Status) : (&StereoGarage_B_Status);
+    StereoGarage_Status = (garage_x == 'A') ? (&StereoGarage_A_Status) : (&StereoGarage_B_Status);
 
     StereoGarage_Status->isSet = RESET;
 
